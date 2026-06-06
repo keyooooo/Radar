@@ -1,7 +1,41 @@
+# IDE
 .vscode/*
 !.vscode/extensions.json
+
+# Dependencies
 node_modules/
+
+# Environment (contains secrets — never commit)
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+.mypy_cache/
+.coverage
+htmlcov/
+.cache
+
+# Frontend build output
+frontend/dist/
+frontend/.swc/
+frontend/.temp/
+
+# Uploaded media (local dev)
+uploads/
+
+# Test artifacts
 /test-results/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude
+.claude/
+radar_context.md

@@ -1,6 +1,9 @@
+import os
+
 import sentry_sdk
 from fastapi import FastAPI
 from fastapi.routing import APIRoute
+from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
 
 from app.api.main import api_router
@@ -22,12 +25,29 @@ app = FastAPI(
 
 # Set all CORS enabled origins
 if settings.all_cors_origins:
+    # Bulletproof: force-inject local dev origins so .env parsing issues
+    # never block local frontend development.
+    allowed_origins = list(settings.all_cors_origins)
+    _local_origins = [
+        "http://localhost:10086",
+        "http://127.0.0.1:10086",
+        "http://localhost:8000",
+    ]
+    for origin in _local_origins:
+        if origin not in allowed_origins:
+            allowed_origins.append(origin)
+
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.all_cors_origins,
+        allow_origins=allowed_origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
+
+# Mount static uploads directory
+_UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "..", "uploads")
+os.makedirs(_UPLOAD_DIR, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=_UPLOAD_DIR), name="uploads")

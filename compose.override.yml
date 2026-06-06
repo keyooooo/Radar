@@ -2,7 +2,6 @@ services:
 
   # Local services are available on their ports, but also available on:
   # http://api.localhost.tiangolo.com: backend
-  # http://dashboard.localhost.tiangolo.com: frontend
   # etc. To enable it, update .env, set:
   # DOMAIN=localhost.tiangolo.com
   proxy:
@@ -55,6 +54,11 @@ services:
     ports:
       - "8080:8080"
 
+  redis:
+    restart: "no"
+    ports:
+      - "6379:6379"
+
   backend:
     restart: "no"
     ports:
@@ -82,52 +86,8 @@ services:
     volumes:
       - ./backend/htmlcov:/app/backend/htmlcov
     environment:
-      SMTP_HOST: "mailcatcher"
-      SMTP_PORT: "1025"
-      SMTP_TLS: "false"
-      EMAILS_FROM_EMAIL: "noreply@example.com"
-
-  mailcatcher:
-    image: schickling/mailcatcher
-    ports:
-      - "1080:1080"
-      - "1025:1025"
-
-  frontend:
-    restart: "no"
-    ports:
-      - "5173:80"
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile
-      args:
-        - VITE_API_URL=http://localhost:8000
-        - NODE_ENV=development
-
-  playwright:
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile.playwright
-      args:
-        - VITE_API_URL=http://backend:8000
-        - NODE_ENV=production
-    ipc: host
-    depends_on:
-      - backend
-      - mailcatcher
-    env_file:
-      - .env
-    environment:
-      - VITE_API_URL=http://backend:8000
-      - MAILCATCHER_HOST=http://mailcatcher:1080
-      # For the reports when run locally
-      - PLAYWRIGHT_HTML_HOST=0.0.0.0
-      - CI=${CI}
-    volumes:
-      - ./frontend/blob-report:/app/frontend/blob-report
-      - ./frontend/test-results:/app/frontend/test-results
-    ports:
-      - 9323:9323
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
 
 networks:
   traefik-public:
