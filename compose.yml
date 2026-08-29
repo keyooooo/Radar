@@ -1,7 +1,7 @@
 services:
 
   db:
-    image: postgres:15
+    image: postgres:18
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
@@ -76,7 +76,7 @@ services:
       - SENTRY_DSN=${SENTRY_DSN}
 
   redis:
-    image: redis:7-alpine
+    image: redis:8-alpine
     restart: always
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
